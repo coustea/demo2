@@ -1,83 +1,79 @@
 <template>
   <div class="login-container">
     <h2>Login</h2>
-    <form @submit.prevent="handleLogin">
+    <form @submit.prevent="login">
       <div class="form-group">
         <label for="email">Email:</label>
-        <input type="email" id="email" v-model="email" required />
+        <input v-model="email" type="email" id="email" required>
       </div>
       <div class="form-group">
         <label for="password">Password:</label>
-        <input type="password" id="password" v-model="password" required />
+        <input v-model="password" type="password" id="password" required>
       </div>
       <button type="submit">Login</button>
     </form>
     <p>Don't have an account? <router-link to="/register">Register</router-link></p>
-    <p v-if="error" class="error">{{ error }}</p>
   </div>
 </template>
 
 <script>
-import api from '../services/api';
-
 export default {
   data() {
     return {
       email: '',
       password: '',
-      error: ''
     };
   },
   methods: {
-    async handleLogin() {
+    async login() {
       try {
-        // 发送登录请求
-        const response = await api.login({
+        // 调用后端登录接口
+        const response = await this.$axios.post('/api/login', {
           email: this.email,
-          password: this.password
+          password: this.password,
         });
 
-        // 假设后端返回的状态码为 200 表示登录成功
-        if (response.status === 200) {
-          alert('Login successful!'); // 弹窗提示登录成功
-          console.log('Login successful:', response.data);
-          // 跳转到主页
-          this.$router.push('/');
+        // 假设后端返回的数据包含用户角色
+        const { role } = response.data;
+
+        // 更新全局登录状态
+        this.$root.isAuthenticated = true;
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userRole', role); // 存储用户角色
+
+        // 根据角色重定向
+        if (role === 'admin') {
+          this.$router.push('/admin-dashboard'); // 管理员界面
         } else {
-          // 如果状态码不是 200，提示登录失败
-          alert('Login failed. Please check your credentials.');
-          this.error = 'Login failed. Please check your credentials.';
+          this.$router.push('/user-dashboard'); // 普通用户界面
         }
-      } catch (err) {
-        // 捕获错误
-        if (err.response && err.response.status === 404) {
-          alert('User not found. Please check your email.'); // 弹窗提示用户不存在
-          this.error = 'User not found. Please check your email.';
-        } else if (err.response && err.response.status === 401) {
-          alert('Incorrect password. Please try again.'); // 弹窗提示密码错误
-          this.error = 'Incorrect password. Please try again.';
-        } else {
-          alert('Login failed. Please try again later.'); // 弹窗提示其他错误
-          this.error = 'Login failed. Please try again later.';
-        }
-        console.error('Login error:', err);
+      } catch (error) {
+        alert('登录失败，请检查邮箱和密码');
+        console.error(error);
       }
-    }
-  }
+    },
+  },
 };
 </script>
+
 <style scoped>
 .login-container {
-  max-width: 300px;
+  max-width: 400px;
   margin: 0 auto;
   padding: 20px;
-  border: 1px solid #ccc;
+  border: 1px solid #ddd;
   border-radius: 5px;
   background-color: #f9f9f9;
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 20px;
 }
 
 .form-group {
   margin-bottom: 15px;
+  text-align: left;
 }
 
 label {
@@ -87,14 +83,15 @@ label {
 
 input {
   width: 100%;
-  padding: 8px;
-  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
 }
 
 button {
   width: 100%;
   padding: 10px;
-  background-color: #42b983;
+  background-color: #409EFF;
   color: white;
   border: none;
   border-radius: 5px;
@@ -102,16 +99,19 @@ button {
 }
 
 button:hover {
-  background-color: #369f6e;
+  background-color: #66b1ff;
 }
 
 p {
-  text-align: center;
   margin-top: 15px;
 }
 
-.error {
-  color: red;
-  text-align: center;
+a {
+  color: #409EFF;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 </style>
