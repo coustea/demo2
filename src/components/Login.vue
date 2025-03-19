@@ -3,17 +3,18 @@
     <h2>Login</h2>
     <form @submit.prevent="handleLogin">
       <div class="form-group">
-        <label for="email">Email:</label>
-        <input type="email" id="email" v-model="email" required />
+        <label for="username">Username:</label>
+        <input type="text" id="username" v-model="username" required />
       </div>
       <div class="form-group">
         <label for="password">Password:</label>
         <input type="password" id="password" v-model="password" required />
       </div>
+      <p v-if="error" class="error">{{ error }}</p>
       <button type="submit">Login</button>
     </form>
     <p>Don't have an account? <router-link to="/register">Register</router-link></p>
-    <p v-if="error" class="error">{{ error }}</p>
+
   </div>
 </template>
 
@@ -31,40 +32,19 @@ export default {
   methods: {
     async handleLogin() {
       try {
-        // 发送登录请求
         const response = await api.login({
-          email: this.email,
+          username: this.username,
           password: this.password
         });
-
-        // 假设后端返回的状态码为 200 表示登录成功
-        if (response.status === 200) {
-          alert('Login successful!'); // 弹窗提示登录成功
-          console.log('Login successful:', response.data);
-          // 跳转到主页
-          this.$router.push('/');
-        } else {
-          // 如果状态码不是 200，提示登录失败
-          alert('Login failed. Please check your credentials.');
-          this.error = 'Login failed. Please check your credentials.';
-        }
-      } catch (err) {
-        // 捕获错误
-        if (err.response && err.response.status === 404) {
-          alert('User not found. Please check your email.'); // 弹窗提示用户不存在
-          this.error = 'User not found. Please check your email.';
-        } else if (err.response && err.response.status === 401) {
-          alert('Incorrect password. Please try again.'); // 弹窗提示密码错误
-          this.error = 'Incorrect password. Please try again.';
-        } else {
-          alert('Login failed. Please try again later.'); // 弹窗提示其他错误
-          this.error = 'Login failed. Please try again later.';
-        }
-        console.error('Login error:', err);
+      }catch(err) {
+        // this.error = err.response.data;
+        this.error = err.response.data;
       }
     }
   }
 };
+
+
 </script>
 <style scoped>
 .login-container {
