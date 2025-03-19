@@ -3,8 +3,8 @@
     <h2>Login</h2>
     <form @submit.prevent="login">
       <div class="form-group">
-        <label for="email">Email:</label>
-        <input v-model="email" type="email" id="email" required>
+        <label for="username">Username:</label>
+        <input v-model="username" type="text" id="username" required>
       </div>
       <div class="form-group">
         <label for="password">Password:</label>
@@ -20,37 +20,22 @@
 export default {
   data() {
     return {
-      email: '',
+      username: '',
       password: '',
     };
   },
   methods: {
-    async login() {
-      try {
-        // 调用后端登录接口
-        const response = await this.$axios.post('/api/login', {
-          email: this.email,
-          password: this.password,
-        });
+    login() {
+      // 模拟登录成功
+      const role = 'admin'; // 直接设置为管理员角色
 
-        // 假设后端返回的数据包含用户角色
-        const { role } = response.data;
+      // 更新全局登录状态
+      this.$root.isAuthenticated = true;
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('userRole', role); // 存储用户角色
 
-        // 更新全局登录状态
-        this.$root.isAuthenticated = true;
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('userRole', role); // 存储用户角色
-
-        // 根据角色重定向
-        if (role === 'admin') {
-          this.$router.push('/admin-dashboard'); // 管理员界面
-        } else {
-          this.$router.push('/user-dashboard'); // 普通用户界面
-        }
-      } catch (error) {
-        alert('登录失败，请检查邮箱和密码');
-        console.error(error);
-      }
+      // 跳转到管理员界面
+      this.$router.push('/admin-dashboard');
     },
   },
 };

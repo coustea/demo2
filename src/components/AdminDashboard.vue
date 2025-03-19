@@ -19,21 +19,22 @@
 export default {
   data() {
     return {
-      userList: [], // 存储用户列表
+      // userList: [{id:1, username:"张三",email:"123@qq.com"},
+      //   {id:2, username:"李四",email:"123@qq.com"}], // 存储用户列表
     };
   },
-  mounted() {
-    this.fetchUsers(); // 加载用户数据
-  },
+  // mounted() {
+  //   this.fetchUsers(); // 加载用户数据
+  // },
   methods: {
-    async fetchUsers() {
-      try {
-        const response = await this.$axios.get('/api/users');
-        this.userList = response.data;
-      } catch (error) {
-        console.error('获取用户列表失败', error);
-      }
-    },
+    // async fetchUsers() {
+    //   try {
+    //     const response = await this.$axios.get('/api/users');
+    //     this.userList = response.data;
+    //   } catch (error) {
+    //     console.error('获取用户列表失败', error);
+    //   }
+    // },
     async deleteUser(id) {
       try {
         await this.$axios.delete(`/api/users/${id}`);
