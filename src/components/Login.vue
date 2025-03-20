@@ -17,6 +17,7 @@
 </template>
 
 <script>
+  import axios from "axios";
 export default {
   data() {
     return {
@@ -25,20 +26,28 @@ export default {
     };
   },
   methods: {
-    login() {
-      // 模拟登录成功
-      const role = 'admin'; // 直接设置为管理员角色
-
-      // 更新全局登录状态
-      this.$root.isAuthenticated = true;
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('userRole', role); // 存储用户角色
-
-      // 跳转到管理员界面
+  login() {
+  axios.post("http://127.0.0.1:8000/user/login/", {
+        username:this.username,
+        password:this.password
+  })
+  .then(res => {
+    if (res.data.username === 'admin' && res.data.code === 200 ) {
+      alert(res.data.message);
       this.$router.push('/admin-dashboard');
-    },
-  },
-};
+    }
+    if (res.data.code === 200) {
+      alert(res.data.message);
+      this.$router.push('/user-dashboard');
+    }
+  })
+  .catch(err => {
+    alert(err.response.data);
+  })}
+
+  }
+}
+
 </script>
 
 <style scoped>

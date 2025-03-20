@@ -21,13 +21,13 @@
       <button type="submit">Register</button>
     </form>
     <p>Already have an account? <router-link to="/login">Login</router-link></p>
-    <p v-if="error" class="error">{{ error }}</p>
+<!--    <p v-if="error" class="error">{{ error }}</p>-->
   </div>
 </template>
 
 <script>
 import api from '../services/api';
-
+import axios from "axios";
 export default {
   data() {
     return {
@@ -35,27 +35,50 @@ export default {
       email: '',
       password: '',
       confirmPassword: '',
-      error: ''
+      error: '' // 确保 error 已定义
     };
   },
   methods: {
     async handleRegister() {
+      // 检查密码是否匹配
       if (this.password !== this.confirmPassword) {
         this.error = "Passwords do not match";
+        alert(this.error); // 提示用户密码不匹配
         return;
       }
-      try {
-        const response = await api.register({
+
+        // 调用注册接口
+        axios.post("http://127.0.0.1:8000/user/register/",{
           username: this.username,
           email: this.email,
           password: this.password
+        })
+            .then(response => {
+            if (response.data.code === 200) {
+              alert(response.data.message); // 注册成功提示
+              this.$router.push('/login'); // 跳转到登录页面
+            }
+        })
+        .catch(error => {
+          if (error.response.status === 404) {
+            alert(error.response.data);
+          }
+          else {
+            alert("网络错误，请稍后重试");
+          }
         });
-        console.log('Registration successful:', response.data);
-        this.$router.push('/login'); // 注册成功后跳转到登录页面
-      } catch (err) {
-        this.error = 'Registration failed. Please try again.';
-        console.error('Registration error:', err);
-      }
+
+        // 检查响应状态码
+      //
+      //  catch (error) {
+      //   // 错误处理
+      //   console.log(error.response);
+      //   if (error.response) {
+      //     alert(error.response.data); // 后端返回的错误信息
+      //   } else {
+      //     alert("网络错误，请稍后重试"); // 网络或其他错误
+      //   }
+      // }
     }
   }
 };
